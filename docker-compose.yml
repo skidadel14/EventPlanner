@@ -1,0 +1,35 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: eventhub_db
+    environment:
+      SA_PASSWORD: "EventHub@12345"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost",
+             "-U", "sa", "-P", "EventHub@12345", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eventhub_api
+    ports:
+      - "8080:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=80
+      - ConnectionStrings__DefaultConnection=Server=db;Database=EventHubDb;User Id=sa;Password=EventHub@12345;TrustServerCertificate=True;
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  sqldata:
