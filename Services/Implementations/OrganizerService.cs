@@ -91,7 +91,10 @@ public class OrganizerService : IOrganizerService
 
         if (!string.IsNullOrEmpty(dto.Name)) organizer.Name = dto.Name;
         
-        if (organizer.Profile == null) organizer.Profile = new OrganizerProfile();
+        if (organizer.Profile == null) 
+        {
+            organizer.Profile = new OrganizerProfile { OrganizerId = id };
+        }
         
         if (dto.Bio != null) organizer.Profile.Bio = dto.Bio;
         if (dto.Phone != null) organizer.Profile.Phone = dto.Phone;

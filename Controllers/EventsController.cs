@@ -40,7 +40,12 @@ public class EventsController : ControllerBase
     {
         if (!ModelState.IsValid) return BadRequest(ModelState);
 
-        var organizerId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userIdString == null || !int.TryParse(userIdString, out var organizerId))
+        {
+            return Unauthorized("Invalid identity token.");
+        }
+        
         var result = await _eventService.CreateAsync(organizerId, dto);
         return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
     }
@@ -68,7 +73,12 @@ public class EventsController : ControllerBase
     [Authorize(Roles = "Attendee")]
     public async Task<IActionResult> RegisterForEvent(int id)
     {
-        var attendeeId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userIdString == null || !int.TryParse(userIdString, out var attendeeId))
+        {
+            return Unauthorized("Invalid identity token.");
+        }
+        
         var success = await _eventService.RegisterAttendeeAsync(id, attendeeId);
         if (!success) return BadRequest("Could not register for event. It might be full, or you are already registered.");
         return Ok("Successfully registered for the event.");

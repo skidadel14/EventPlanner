@@ -147,3 +147,10 @@ C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHub
 C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\obj\Debug\net8.0\EventHubAPI.pdb
 C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\obj\Debug\net8.0\EventHubAPI.genruntimeconfig.cache
 C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\obj\Debug\net8.0\ref\EventHubAPI.dll
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\nuget.config
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\appsettings.Development.json
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\appsettings.json
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\EventHubAPI.deps.json
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\EventHubAPI.runtimeconfig.json
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\bin\Debug\net8.0\publish\EventHubAPI.staticwebassets.endpoints.json
+C:\Users\coldb\OneDrive\Desktop\Semester 10\Web Engineering\Project 7th\EventHubAPI\obj\Debug\net8.0\EventHubAPI.sourcelink.json

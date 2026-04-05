@@ -22,38 +22,54 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IAttendeeService, AttendeeService>();
 
 // 3. AddAuthentication with JwtBearer
+const string jwtKey = "EventHubSuperSecretJwtKeyThatIsAtLeast32Chars!";
+const string jwtIssuer = "EventHubAPI";
+const string jwtAudience = "EventHubClient";
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
+            ValidateIssuer = false,
+            ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            ClockSkew = TimeSpan.Zero
+        };
+        // Read token from "auth_token" cookie instead of Authorization header
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                if (context.Request.Cookies.ContainsKey("auth_token"))
+                {
+                    context.Token = context.Request.Cookies["auth_token"];
+                }
+                return Task.CompletedTask;
+            }
         };
     });
 
 // 4. AddAuthorization
 builder.Services.AddAuthorization();
 
-// 5. AddEndpointsApiExplorer and Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "EventHub API", Version = "v1" });
 
-    // JWT Bearer Authentication for Swagger
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    // Cookie-based Authentication for Swagger
+    c.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
+        Description = "JWT stored in the 'auth_token' HttpOnly cookie. Login via /api/Auth/organizer/login or /api/Auth/attendee/login to set the cookie automatically.",
+        Name = "auth_token",
+        In = ParameterLocation.Cookie,
         Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        Scheme = "cookieAuth"
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -64,7 +80,7 @@ builder.Services.AddSwaggerGen(c =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
+                    Id = "cookieAuth"
                 }
             },
             Array.Empty<string>()
@@ -74,11 +90,22 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Auto-apply migrations on startup
+// Auto-apply migrations or ensure database creation on startup
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
+    var services = scope.ServiceProvider;
+    try 
+    {
+        var db = services.GetRequiredService<AppDbContext>();
+        // Using Migrate() is consistent and ensures the database is created
+        // and all migrations are applied.
+        db.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while seeding the database.");
+    }
 }
 
 // Configure the HTTP request pipeline.

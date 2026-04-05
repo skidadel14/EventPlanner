@@ -71,7 +71,7 @@ public class AttendeeService : IAttendeeService
         var attendee = await _context.Attendees.FindAsync(id);
         if (attendee == null) return null;
 
-        if (dto.Name != null) attendee.Name = dto.Name;
+        if (!string.IsNullOrEmpty(dto.Name)) attendee.Name = dto.Name;
 
         await _context.SaveChangesAsync();
         return await GetByIdAsync(id);

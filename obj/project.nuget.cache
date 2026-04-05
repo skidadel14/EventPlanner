@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "9/OouBL3heI=",
+  "dgSpecHash": "j5wmOP33k3g=",
   "success": true,
   "projectFilePath": "C:\\Users\\coldb\\OneDrive\\Desktop\\Semester 10\\Web Engineering\\Project 7th\\EventHubAPI\\EventHubAPI.csproj",
   "expectedPackageFiles": [
@@ -86,7 +86,7 @@
     "C:\\Users\\coldb\\.nuget\\packages\\microsoft.netcore.app.ref\\8.0.24\\microsoft.netcore.app.ref.8.0.24.nupkg.sha512",
     "C:\\Users\\coldb\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\8.0.24\\microsoft.windowsdesktop.app.ref.8.0.24.nupkg.sha512",
     "C:\\Users\\coldb\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\8.0.24\\microsoft.aspnetcore.app.ref.8.0.24.nupkg.sha512",
-    "C:\\Users\\coldb\\.nuget\\packages\\microsoft.netcore.app.host.linux-x64\\8.0.24\\microsoft.netcore.app.host.linux-x64.8.0.24.nupkg.sha512"
+    "C:\\Users\\coldb\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\8.0.24\\microsoft.netcore.app.host.win-x64.8.0.24.nupkg.sha512"
   ],
   "logs": []
 }

@@ -33,7 +33,8 @@ public class AuthController : ControllerBase
         }
 
         var token = GenerateToken(organizer.Id.ToString(), organizer.Email, organizer.Role);
-        return Ok(new { Token = token });
+        SetAuthCookie(token);
+        return Ok(new { Message = "Login successful", Role = organizer.Role });
     }
 
     [HttpPost("attendee/login")]
@@ -46,7 +47,15 @@ public class AuthController : ControllerBase
         }
 
         var token = GenerateToken(attendee.Id.ToString(), attendee.Email, attendee.Role);
-        return Ok(new { Token = token });
+        SetAuthCookie(token);
+        return Ok(new { Message = "Login successful", Role = attendee.Role });
+    }
+
+    [HttpPost("logout")]
+    public IActionResult Logout()
+    {
+        Response.Cookies.Delete("auth_token");
+        return Ok(new { Message = "Logged out successfully" });
     }
 
     private string GenerateToken(string id, string email, string role)
@@ -58,17 +67,29 @@ public class AuthController : ControllerBase
             new Claim(ClaimTypes.Role, role)
         };
 
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
+        const string jwtKey = "EventHubSuperSecretJwtKeyThatIsAtLeast32Chars!";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-            issuer: _config["Jwt:Issuer"],
-            audience: _config["Jwt:Audience"],
+            issuer: "EventHubAPI",
+            audience: "EventHubClient",
             claims: claims,
-            expires: DateTime.Now.AddHours(8),
+            expires: DateTime.UtcNow.AddHours(8),
             signingCredentials: creds
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    private void SetAuthCookie(string token)
+    {
+        Response.Cookies.Append("auth_token", token, new CookieOptions
+        {
+            HttpOnly = true,        // Not accessible via JavaScript (XSS protection)
+            Secure = false,         // Set to true in production with HTTPS
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTimeOffset.UtcNow.AddHours(8)
+        });
     }
 }
